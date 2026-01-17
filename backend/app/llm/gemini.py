@@ -1,54 +1,85 @@
 """
-Gemini LLM Provider - Google Gemini models
+Google Gemini LLM Provider
 """
+from typing import Optional, Dict, Any
 import google.generativeai as genai
-from typing import Optional
 
 from .base import BaseLLMProvider
 from ..core.exceptions import LLMProviderError
 
 
 class GeminiProvider(BaseLLMProvider):
-    """
-    Google Gemini API provider.
-    """
+    """Google Gemini provider implementation"""
 
-    def __init__(
-        self,
-        model: str = "gemini-1.5-flash",
-        api_key: Optional[str] = None,
-        max_tokens: int = 4096,
-        temperature: float = 0.7
-    ):
-        self.model_name = model
-        self.max_tokens = max_tokens
-        self.temperature = temperature
+    def __init__(self, model: str = "gemini-1.5-flash", api_key: str = None, **kwargs):
+        super().__init__(model, api_key, **kwargs)
+        if not self.api_key:
+            raise LLMProviderError("gemini", "API key is required")
 
-        # Configure Gemini API key
-        genai.configure(api_key=api_key)
+        # Configure the API
+        genai.configure(api_key=self.api_key)
+        self.client = genai.GenerativeModel(model)
 
-        # Create Gemini model
-        self.model = genai.GenerativeModel(model)
+    @property
+    def provider_name(self) -> str:
+        return "google"
 
     async def generate(
         self,
-        system_prompt: str,
-        user_prompt: str,
-        **kwargs
+        prompt: str,
+        context: Optional[Dict[str, Any]] = None,
+        system_prompt: Optional[str] = None
     ) -> str:
+        """Generate response using Gemini"""
         try:
-            # Gemini does not support system role, so we combine prompts
-            full_prompt = f"{system_prompt}\n\n---\n\n{user_prompt}"
+            # Build the full prompt with context
+            full_prompt = ""
 
-            response = self.model.generate_content(
+            # Add system prompt
+            if system_prompt:
+                full_prompt += f"Instructions: {system_prompt}\n\n"
+
+            # Add context
+            if context:
+                # Handle structured facts (new approach)
+                if context.get("facts_by_type"):
+                    full_prompt += "## Relevant Context (from shared memory):\n\n"
+                    facts_by_type = context["facts_by_type"]
+                    
+                    for category in ["facts", "decisions", "requirements", "insights"]:
+                        if facts_by_type.get(category):
+                            full_prompt += f"### {category.title()}:\n"
+                            for fact in facts_by_type[category]:
+                                full_prompt += f"- {fact['content']} (source: {fact['agent_role']})\n"
+                            full_prompt += "\n"
+                    full_prompt += "---\n\n"
+                
+                # Fallback to previous outputs
+                elif context.get("previous_outputs"):
+                    full_prompt += "## Previous Agent Outputs:\n"
+                    for agent_id, output in context["previous_outputs"].items():
+                        full_prompt += f"\n### {agent_id}:\n{output}\n"
+                    full_prompt += "\n---\n\n"
+
+                if context.get("query"):
+                    full_prompt += f"## Original Query:\n{context['query']}\n\n"
+
+            full_prompt += f"## Your Task:\n{prompt}"
+
+            # Generate response
+            response = self.client.generate_content(
                 full_prompt,
                 generation_config=genai.types.GenerationConfig(
-                    max_output_tokens=kwargs.get("max_tokens", self.max_tokens),
-                    temperature=kwargs.get("temperature", self.temperature)
+                    max_output_tokens=self.max_tokens,
+                    temperature=self.temperature,
                 )
             )
 
-            return response.text
+            # Extract text from response
+            if response.text:
+                return response.text
+
+            return ""
 
         except Exception as e:
-            raise LLMProviderError("gemini", str(e))
+            raise LLMProviderError("gemini", f"Error: {str(e)}")
