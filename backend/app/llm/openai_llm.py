@@ -1,54 +1,54 @@
-from typing import Optional, Dict, Any
-
-from openai import OpenAI, APIError
+"""
+OpenAI LLM Provider - GPT models
+"""
+import openai
+from typing import Optional
 
 from .base import BaseLLMProvider
+from ..core.exceptions import LLMProviderError
 
 
 class OpenAIProvider(BaseLLMProvider):
     """
-    Concrete OpenAI implementation of BaseLLMProvider.
+    OpenAI API provider.
     """
 
-    def __init__(self, model: str, api_key: str, **kwargs):
-        super().__init__(model, api_key, **kwargs)
+    def __init__(
+        self,
+        model: str = "gpt-4o",
+        api_key: Optional[str] = None,
+        max_tokens: int = 4096,
+        temperature: float = 0.7
+    ):
+        self.model = model
+        self.max_tokens = max_tokens
+        self.temperature = temperature
 
-        if not api_key:
-            raise ValueError("OpenAI API key is required")
-
-        self.client = OpenAI(api_key=self.api_key)
-
-    @property
-    def provider_name(self) -> str:
-        return "openai"
+        # OpenAI client (connection to OpenAI servers)
+        self.client = openai.OpenAI(api_key=api_key)
 
     async def generate(
         self,
-        prompt: str,
-        context: Optional[Dict[str, Any]] = None,
-        system_prompt: Optional[str] = None,
+        system_prompt: str,
+        user_prompt: str,
+        **kwargs
     ) -> str:
         try:
-            messages = self._build_messages(
-                prompt=prompt,
-                context=context,
-                system_prompt=system_prompt
-            )
+            # Build chat messages
+            messages = self._build_messages(system_prompt, user_prompt)
 
+            # Call OpenAI API
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=messages,
-                max_tokens=self.max_tokens,
-                temperature=self.temperature,
+                max_tokens=kwargs.get("max_tokens", self.max_tokens),
+                temperature=kwargs.get("temperature", self.temperature)
             )
 
-            if response.choices:
-                return response.choices[0].message.content or ""
+            # Return text output
+            return response.choices[0].message.content
 
-            return ""
-
-        except APIError as e:
-            raise RuntimeError(f"OpenAI API error: {e}")
-
+        except openai.APIError as e:
+            raise LLMProviderError("openai", str(e))
         except Exception as e:
-            raise RuntimeError(f"Unexpected error: {e}")
+            raise LLMProviderError("openai", str(e))
