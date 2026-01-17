@@ -115,6 +115,70 @@ class SharedMemory:
             "stored_in_vector_db": self.vector_memory is not None
         })
 
+    def store_facts(
+        self,
+        agent_id: str,
+        agent_role: str,
+        facts: List[Dict[str, Any]]
+    ) -> None:
+        """
+        Store extracted facts in vector DB.
+        
+        Args:
+            agent_id: ID of source agent
+            agent_role: Role of source agent
+            facts: List of fact dicts
+        """
+        if not self.vector_memory or not facts:
+            return
+        
+        try:
+            self.vector_memory.store_facts(agent_id, agent_role, facts)
+            self.add_log({
+                "event": "facts_stored",
+                "agent_id": agent_id,
+                "facts_count": len(facts)
+            })
+        except Exception as e:
+            self.add_log({
+                "event": "facts_store_failed",
+                "agent_id": agent_id,
+                "error": str(e)
+            })
+
+    def search_facts(
+        self,
+        query: str,
+        n_results: int = 10,
+        exclude_agent_ids: Optional[List[str]] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Search for relevant facts using semantic similarity.
+        
+        Args:
+            query: Query to search for
+            n_results: Max results
+            exclude_agent_ids: Agents to exclude
+        
+        Returns:
+            List of fact dicts
+        """
+        if not self.vector_memory:
+            return []
+        
+        try:
+            return self.vector_memory.search_facts(
+                query=query,
+                n_results=n_results,
+                exclude_agent_ids=exclude_agent_ids
+            )
+        except Exception as e:
+            self.add_log({
+                "event": "facts_search_failed",
+                "error": str(e)
+            })
+            return []
+
     def get_output(self, agent_id: str) -> Optional[str]:
         """Get a specific agent's output"""
         return self.agent_outputs.get(agent_id)
