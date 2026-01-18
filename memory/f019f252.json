@@ -1,0 +1,73 @@
+{
+  "workflow_id": "f019f252",
+  "agent_outputs": {},
+  "execution_log": [
+    {
+      "timestamp": "2026-01-18T10:01:23.605356",
+      "event": "vector_memory_initialized",
+      "vector_db_dir": "vector_db"
+    },
+    {
+      "timestamp": "2026-01-18T10:01:23.605440",
+      "event": "orchestrator_initialized",
+      "workflow_id": "f019f252",
+      "agents": [
+        "researcher",
+        "writer"
+      ],
+      "workflow_type": "sequential",
+      "mcp_servers": []
+    },
+    {
+      "timestamp": "2026-01-18T10:01:23.606722",
+      "event": "execution_start",
+      "query": "Hello, tell me a joke"
+    },
+    {
+      "timestamp": "2026-01-18T10:01:23.606824",
+      "event": "sequential_start",
+      "total_steps": 2
+    },
+    {
+      "timestamp": "2026-01-18T10:01:23.606828",
+      "event": "step_start",
+      "step": 1,
+      "agent_id": "researcher",
+      "agent_role": "Research Assistant"
+    },
+    {
+      "timestamp": "2026-01-18T10:01:23.606832",
+      "event": "agent_start",
+      "agent_id": "researcher",
+      "agent_role": "Research Assistant",
+      "context_keys": [
+        "query",
+        "previous_outputs",
+        "context_mode",
+        "current_agent"
+      ]
+    },
+    {
+      "timestamp": "2026-01-18T10:01:23.903475",
+      "event": "agent_error",
+      "agent_id": "researcher",
+      "error": "LLM Provider Error (gemini): API Error (429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\nPlease retry in 36.108337783s."
+    },
+    {
+      "timestamp": "2026-01-18T10:01:23.903524",
+      "event": "step_failed",
+      "step": 1,
+      "agent_id": "researcher",
+      "error": "Workflow Execution Error: LLM Provider Error (gemini): API Error (429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\nPlease retry in 36.108337783s. (agent: researcher)"
+    },
+    {
+      "timestamp": "2026-01-18T10:01:23.903531",
+      "event": "execution_failed",
+      "error": "Workflow Execution Error: Workflow Execution Error: LLM Provider Error (gemini): API Error (429): You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\nPlease retry in 36.108337783s. (agent: researcher) (agent: researcher) at step 0",
+      "execution_time": 0.29680800437927246
+    }
+  ],
+  "persistent_data": {},
+  "created_at": "2026-01-18T10:01:22.880129",
+  "updated_at": "2026-01-18T10:01:22.880129"
+}

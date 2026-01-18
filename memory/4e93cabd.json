@@ -1,0 +1,73 @@
+{
+  "workflow_id": "4e93cabd",
+  "agent_outputs": {},
+  "execution_log": [
+    {
+      "timestamp": "2026-01-18T09:17:41.301567",
+      "event": "vector_memory_initialized",
+      "vector_db_dir": "vector_db"
+    },
+    {
+      "timestamp": "2026-01-18T09:17:41.302067",
+      "event": "orchestrator_initialized",
+      "workflow_id": "4e93cabd",
+      "agents": [
+        "researcher",
+        "writer"
+      ],
+      "workflow_type": "sequential",
+      "mcp_servers": []
+    },
+    {
+      "timestamp": "2026-01-18T09:17:41.303257",
+      "event": "execution_start",
+      "query": "Tell me about AI"
+    },
+    {
+      "timestamp": "2026-01-18T09:17:41.303268",
+      "event": "sequential_start",
+      "total_steps": 2
+    },
+    {
+      "timestamp": "2026-01-18T09:17:41.303272",
+      "event": "step_start",
+      "step": 1,
+      "agent_id": "researcher",
+      "agent_role": "Research Assistant"
+    },
+    {
+      "timestamp": "2026-01-18T09:17:41.303275",
+      "event": "agent_start",
+      "agent_id": "researcher",
+      "agent_role": "Research Assistant",
+      "context_keys": [
+        "query",
+        "previous_outputs",
+        "context_mode",
+        "current_agent"
+      ]
+    },
+    {
+      "timestamp": "2026-01-18T09:17:41.811849",
+      "event": "agent_error",
+      "agent_id": "researcher",
+      "error": "LLM Provider Error (gemini): Error: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+    },
+    {
+      "timestamp": "2026-01-18T09:17:41.811959",
+      "event": "step_failed",
+      "step": 1,
+      "agent_id": "researcher",
+      "error": "Workflow Execution Error: LLM Provider Error (gemini): Error: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods. (agent: researcher)"
+    },
+    {
+      "timestamp": "2026-01-18T09:17:41.811985",
+      "event": "execution_failed",
+      "error": "Workflow Execution Error: Workflow Execution Error: LLM Provider Error (gemini): Error: 404 models/gemini-pro is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods. (agent: researcher) (agent: researcher) at step 0",
+      "execution_time": 0.5087261199951172
+    }
+  ],
+  "persistent_data": {},
+  "created_at": "2026-01-18T09:17:40.790529",
+  "updated_at": "2026-01-18T09:17:40.790529"
+}

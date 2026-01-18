@@ -1,0 +1,73 @@
+{
+  "workflow_id": "998d2b6c",
+  "agent_outputs": {},
+  "execution_log": [
+    {
+      "timestamp": "2026-01-18T10:01:49.190508",
+      "event": "vector_memory_initialized",
+      "vector_db_dir": "vector_db"
+    },
+    {
+      "timestamp": "2026-01-18T10:01:49.190565",
+      "event": "orchestrator_initialized",
+      "workflow_id": "998d2b6c",
+      "agents": [
+        "researcher",
+        "writer"
+      ],
+      "workflow_type": "sequential",
+      "mcp_servers": []
+    },
+    {
+      "timestamp": "2026-01-18T10:01:49.191630",
+      "event": "execution_start",
+      "query": "Hello"
+    },
+    {
+      "timestamp": "2026-01-18T10:01:49.191723",
+      "event": "sequential_start",
+      "total_steps": 2
+    },
+    {
+      "timestamp": "2026-01-18T10:01:49.191727",
+      "event": "step_start",
+      "step": 1,
+      "agent_id": "researcher",
+      "agent_role": "Research Assistant"
+    },
+    {
+      "timestamp": "2026-01-18T10:01:49.191731",
+      "event": "agent_start",
+      "agent_id": "researcher",
+      "agent_role": "Research Assistant",
+      "context_keys": [
+        "query",
+        "previous_outputs",
+        "context_mode",
+        "current_agent"
+      ]
+    },
+    {
+      "timestamp": "2026-01-18T10:01:49.519544",
+      "event": "agent_error",
+      "agent_id": "researcher",
+      "error": "LLM Provider Error (gemini): API Error (404): models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods."
+    },
+    {
+      "timestamp": "2026-01-18T10:01:49.519558",
+      "event": "step_failed",
+      "step": 1,
+      "agent_id": "researcher",
+      "error": "Workflow Execution Error: LLM Provider Error (gemini): API Error (404): models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods. (agent: researcher)"
+    },
+    {
+      "timestamp": "2026-01-18T10:01:49.519564",
+      "event": "execution_failed",
+      "error": "Workflow Execution Error: Workflow Execution Error: LLM Provider Error (gemini): API Error (404): models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods. (agent: researcher) (agent: researcher) at step 0",
+      "execution_time": 0.32793283462524414
+    }
+  ],
+  "persistent_data": {},
+  "created_at": "2026-01-18T10:01:48.601979",
+  "updated_at": "2026-01-18T10:01:48.601979"
+}

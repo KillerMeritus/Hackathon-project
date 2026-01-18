@@ -1,0 +1,73 @@
+{
+  "workflow_id": "fb5236e6",
+  "agent_outputs": {},
+  "execution_log": [
+    {
+      "timestamp": "2026-01-18T09:13:35.334860",
+      "event": "vector_memory_initialized",
+      "vector_db_dir": "vector_db"
+    },
+    {
+      "timestamp": "2026-01-18T09:13:35.335076",
+      "event": "orchestrator_initialized",
+      "workflow_id": "fb5236e6",
+      "agents": [
+        "researcher",
+        "writer"
+      ],
+      "workflow_type": "sequential",
+      "mcp_servers": []
+    },
+    {
+      "timestamp": "2026-01-18T09:13:35.336267",
+      "event": "execution_start",
+      "query": "Tell me about artificial intelligence"
+    },
+    {
+      "timestamp": "2026-01-18T09:13:35.336277",
+      "event": "sequential_start",
+      "total_steps": 2
+    },
+    {
+      "timestamp": "2026-01-18T09:13:35.336280",
+      "event": "step_start",
+      "step": 1,
+      "agent_id": "researcher",
+      "agent_role": "Research Assistant"
+    },
+    {
+      "timestamp": "2026-01-18T09:13:35.336284",
+      "event": "agent_start",
+      "agent_id": "researcher",
+      "agent_role": "Research Assistant",
+      "context_keys": [
+        "query",
+        "previous_outputs",
+        "context_mode",
+        "current_agent"
+      ]
+    },
+    {
+      "timestamp": "2026-01-18T09:13:35.698159",
+      "event": "agent_error",
+      "agent_id": "researcher",
+      "error": "LLM Provider Error (gemini): Error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. "
+    },
+    {
+      "timestamp": "2026-01-18T09:13:35.698180",
+      "event": "step_failed",
+      "step": 1,
+      "agent_id": "researcher",
+      "error": "Workflow Execution Error: LLM Provider Error (gemini): Error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit.  (agent: researcher)"
+    },
+    {
+      "timestamp": "2026-01-18T09:13:35.698186",
+      "event": "execution_failed",
+      "error": "Workflow Execution Error: Workflow Execution Error: LLM Provider Error (gemini): Error: 429 You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit.  (agent: researcher) (agent: researcher) at step 0",
+      "execution_time": 0.36191892623901367
+    }
+  ],
+  "persistent_data": {},
+  "created_at": "2026-01-18T09:13:34.870281",
+  "updated_at": "2026-01-18T09:13:34.870281"
+}
