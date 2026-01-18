@@ -1,0 +1,43 @@
+# Three-Agent Sequential Pipeline
+# Researcher → Analyst → Writer
+
+agents:
+  - id: researcher
+    role: Research Specialist
+    goal: Gather comprehensive information about the topic
+    model: openai
+    instruction: |
+      You are a research specialist. Gather detailed information including:
+      - Key facts and statistics
+      - Recent developments
+      - Expert opinions
+      - Relevant examples
+
+  - id: analyst
+    role: Data Analyst
+    goal: Analyze the research and identify patterns and insights
+    model: openai
+    instruction: |
+      You are a data analyst. Based on the research provided:
+      - Identify key patterns and trends
+      - Draw meaningful conclusions
+      - Highlight important insights
+      - Provide data-driven recommendations
+
+  - id: writer
+    role: Executive Writer
+    goal: Create an executive summary from the analysis
+    model: openai
+    instruction: |
+      You are an executive writer. Create a polished summary that:
+      - Highlights key findings
+      - Presents actionable insights
+      - Is clear and concise
+      - Suitable for executive audience
+
+workflow:
+  type: sequential
+  steps:
+    - agent: researcher
+    - agent: analyst
+    - agent: writer

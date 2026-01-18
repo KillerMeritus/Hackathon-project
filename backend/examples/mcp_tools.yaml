@@ -1,0 +1,53 @@
+# MCP Tools Example Workflow
+# This example shows how to configure MCP servers and use their tools
+
+# MCP Server Configurations
+mcp_servers:
+  - id: local-tools
+    url: http://localhost:3000
+    transport: http
+    auto_discover: true  # Discover all tools from server
+    timeout: 30
+
+  # Example: Specific tools only
+  # - id: other-server
+  #   url: http://localhost:4000
+  #   auto_discover: false
+  #   tools:
+  #     - search
+  #     - calculator
+
+agents:
+  - id: researcher
+    role: Research Assistant
+    goal: Search for information and analyze data using available tools
+    model: openai
+    tools:
+      - python             # Built-in tool
+      - mcp:local-tools    # All tools from local-tools server
+    instruction: |
+      You are a research assistant with access to external tools.
+      Use the available tools to search for information and analyze data.
+      Always cite your sources and provide accurate information.
+
+  - id: writer
+    role: Content Writer
+    goal: Write a comprehensive summary using the research
+    model: openai
+    instruction: |
+      You are a skilled content writer.
+      Review the research provided and write a clear, engaging summary.
+      Focus on key insights and actionable information.
+
+workflow:
+  type: sequential
+  steps:
+    - agent: researcher
+    - agent: writer
+
+models:
+  openai:
+    provider: openai
+    model: gpt-4o
+    max_tokens: 4096
+    temperature: 0.7

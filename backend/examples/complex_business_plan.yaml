@@ -1,0 +1,219 @@
+# Complex Workflow: AI Startup Business Plan Generator
+# Demonstrates shared memory where later agents use facts from earlier agents
+
+name: ai_startup_business_plan
+description: |
+  Complete business plan generation for an AI startup.
+  Shows shared memory in action - each agent builds on previous agents' findings.
+
+agents:
+  # ============================================
+  # PHASE 1: RESEARCH (Parallel - 3 agents)
+  # ============================================
+  
+  - id: market_researcher
+    role: Market Research Analyst
+    model: openai
+    goal: Research the AI market, identify opportunities, and analyze target customers
+    instruction: |
+      Provide detailed research on:
+      - Total Addressable Market (TAM) with specific numbers
+      - Target customer segments and personas
+      - Customer pain points and needs
+      - Market growth trends and projections
+      
+      Format your findings as bullet points with clear facts.
+      Each finding should be actionable for other team members.
+
+  - id: competitor_analyst
+    role: Competitive Intelligence Specialist
+    model: openai
+    goal: Analyze competitors, their strategies, pricing, and market positioning
+    instruction: |
+      Research and document:
+      - Top 5 competitors with their strengths/weaknesses
+      - Competitor pricing models and tiers
+      - Feature comparison matrix
+      - Market gaps and opportunities
+      
+      Provide specific data that can inform our strategy.
+
+  - id: tech_researcher
+    role: Technology Trend Analyst
+    model: openai
+    goal: Identify relevant technologies, AI trends, and technical requirements
+    instruction: |
+      Analyze:
+      - Current AI/ML technology landscape
+      - Emerging technologies relevant to our product
+      - Technical infrastructure requirements
+      - Build vs buy recommendations
+      
+      Be specific about technologies and their applications.
+
+  # ============================================
+  # PHASE 1 AGGREGATOR
+  # ============================================
+  
+  - id: research_synthesizer
+    role: Research Lead
+    model: openai
+    goal: Synthesize all research into key strategic insights
+    instruction: |
+      IMPORTANT: You have access to findings from market_researcher, 
+      competitor_analyst, and tech_researcher via shared memory.
+      
+      Create a unified research summary:
+      - Key market opportunities (from market research)
+      - Competitive advantages we can build (from competitor analysis)
+      - Technology stack recommendations (from tech research)
+      - Top 5 strategic recommendations
+      
+      This summary will guide all subsequent planning.
+
+  # ============================================
+  # PHASE 2: STRATEGY (Sequential - uses research)
+  # ============================================
+  
+  - id: product_strategist
+    role: Product Strategy Director
+    model: openai
+    goal: Define product vision, features, and roadmap based on research
+    instruction: |
+      Using insights from the research phase (available via shared memory):
+      
+      Define:
+      - Product vision and mission statement
+      - Core features for MVP (based on market gaps identified)
+      - Feature prioritization using MoSCoW method
+      - 12-month product roadmap
+      - Success metrics and KPIs
+      
+      Reference specific findings from the research when making decisions.
+
+  - id: pricing_strategist
+    role: Pricing & Monetization Expert
+    model: openai
+    goal: Develop pricing strategy based on competitor and market analysis
+    instruction: |
+      Using competitor pricing data and market research (from shared memory):
+      
+      Create:
+      - Pricing model recommendation (freemium, subscription, usage-based)
+      - Specific price points for each tier
+      - Feature allocation across tiers
+      - Promotional launch pricing
+      - Revenue projections
+      
+      Justify pricing based on competitor analysis and market positioning.
+
+  - id: gtm_strategist
+    role: Go-to-Market Strategist
+    model: openai
+    goal: Develop go-to-market strategy leveraging all previous insights
+    instruction: |
+      Using all available context from research and strategy phases:
+      
+      Create:
+      - Target customer acquisition channels
+      - Marketing message and positioning
+      - Launch timeline and milestones
+      - Partnership opportunities
+      - First 90 days action plan
+      
+      Ensure GTM strategy aligns with product and pricing decisions.
+
+  # ============================================
+  # PHASE 3: FINANCIALS (Uses all previous data)
+  # ============================================
+  
+  - id: financial_modeler
+    role: Financial Planning Analyst
+    model: openai
+    goal: Create financial projections using all strategic inputs
+    instruction: |
+      Using pricing strategy, market size, and GTM plan from shared memory:
+      
+      Create:
+      - 3-year revenue projections
+      - Customer acquisition cost (CAC) estimates
+      - Lifetime value (LTV) calculations
+      - Monthly burn rate projection
+      - Break-even analysis
+      - Funding requirements
+      
+      All numbers should be based on data from previous agents.
+
+  # ============================================
+  # FINAL: BUSINESS PLAN COMPILER
+  # ============================================
+  
+  - id: business_plan_compiler
+    role: Business Plan Writer
+    model: openai
+    goal: Compile all insights into a cohesive executive business plan
+    instruction: |
+      You have access to ALL previous agent outputs via shared memory.
+      
+      Create an executive business plan with:
+      
+      1. EXECUTIVE SUMMARY
+         - Company overview
+         - Problem we solve
+         - Our solution
+         - Market opportunity
+         
+      2. MARKET ANALYSIS
+         - Use market researcher's findings
+         - Include TAM/SAM/SOM
+         
+      3. COMPETITIVE LANDSCAPE
+         - Use competitor analyst's data
+         - Our differentiation
+         
+      4. PRODUCT STRATEGY
+         - Use product strategist's roadmap
+         - MVP features
+         
+      5. BUSINESS MODEL
+         - Use pricing strategist's recommendations
+         - Revenue streams
+         
+      6. GO-TO-MARKET
+         - Use GTM strategist's plan
+         - Launch strategy
+         
+      7. FINANCIAL PROJECTIONS
+         - Use financial modeler's numbers
+         - Funding ask
+         
+      8. TEAM & NEXT STEPS
+      
+      Make this investor-ready and reference specific data points.
+
+models:
+  openai:
+    provider: openai
+    model: gpt-3.5-turbo
+    max_tokens: 2500
+    temperature: 0.7
+
+# Workflow: Parallel research → Sequential strategy → Final compilation
+workflow:
+  type: parallel
+  branches:
+    - market_researcher
+    - competitor_analyst
+    - tech_researcher
+  then:
+    agent: research_synthesizer
+    then:
+      agent: product_strategist
+      then:
+        agent: pricing_strategist
+        then:
+          agent: gtm_strategist
+          then:
+            agent: financial_modeler
+            then:
+              agent: business_plan_compiler

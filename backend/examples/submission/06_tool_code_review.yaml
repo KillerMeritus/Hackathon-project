@@ -1,0 +1,154 @@
+# SUBMISSION EXAMPLE 6: Advanced Tool Chain Workflow
+# Demonstrates: Tool chaining + Complex workflow + Persistent memory
+# Use Case: Automated Code Review and Optimization
+
+name: code_review_pipeline
+description: |
+  Automated code review workflow with tool-powered analysis.
+  Demonstrates advanced tool integration and agent collaboration.
+  Uses Python tool for code analysis and metrics calculation.
+
+# Built-in tools
+tools:
+  - name: python
+    type: builtin
+    description: Execute Python code for code analysis
+
+agents:
+  - id: code_parser
+    role: Code Analysis Specialist
+    model: openai
+    goal: Parse and analyze code structure
+    tools:
+      - python
+    instruction: |
+      Analyze the provided code:
+      
+      Using Python tool:
+      - Count lines of code
+      - Identify functions and classes
+      - Calculate cyclomatic complexity estimate
+      - Find code patterns
+      
+      Example Python analysis:
+      ```python
+      code = '''[paste code here]'''
+      print(f"Lines: {len(code.split(chr(10)))}")
+      print(f"Functions: {code.count('def ')}")
+      print(f"Classes: {code.count('class ')}")
+      ```
+      
+      Store structural analysis for review.
+
+  - id: security_reviewer
+    role: Security Code Reviewer
+    model: openai
+    goal: Identify security vulnerabilities
+    instruction: |
+      Using code structure from shared memory:
+      
+      Check for:
+      - SQL injection vulnerabilities
+      - XSS attack vectors
+      - Hardcoded credentials
+      - Insecure data handling
+      - Authentication issues
+      - Input validation problems
+      
+      Rate severity: CRITICAL/HIGH/MEDIUM/LOW
+      Provide fix recommendations for each issue.
+
+  - id: performance_reviewer
+    role: Performance Optimization Specialist
+    model: openai
+    goal: Identify performance improvements
+    tools:
+      - python
+    instruction: |
+      Using code analysis from shared memory:
+      
+      Identify:
+      - Inefficient algorithms (O(n²) etc.)
+      - Unnecessary loops or iterations
+      - Memory leak potential
+      - Database query optimization
+      - Caching opportunities
+      
+      Calculate estimated improvement percentage.
+      Use Python for complexity analysis.
+
+  - id: style_reviewer
+    role: Code Style and Quality Reviewer
+    model: openai
+    goal: Review code style and best practices
+    instruction: |
+      Using code structure from shared memory:
+      
+      Check:
+      - Naming conventions
+      - Code documentation
+      - Function length and complexity
+      - DRY principle violations
+      - SOLID principles adherence
+      
+      Score: 1-10 for each category
+      Provide specific improvement suggestions.
+
+  - id: review_summarizer
+    role: Code Review Lead
+    model: openai
+    goal: Compile comprehensive code review report
+    instruction: |
+      Using ALL reviews from shared memory:
+      
+      Create comprehensive report:
+      
+      ## CODE REVIEW REPORT
+      
+      ### 1. Code Metrics
+      - Lines of code, functions, classes (from code_parser)
+      - Complexity score
+      
+      ### 2. Security Assessment
+      - Vulnerabilities found (from security_reviewer)
+      - Priority fixes required
+      
+      ### 3. Performance Analysis
+      - Optimization opportunities (from performance_reviewer)
+      - Estimated improvements
+      
+      ### 4. Code Quality Score
+      - Style score (from style_reviewer)
+      - Best practices adherence
+      
+      ### 5. Overall Verdict
+      - APPROVED / NEEDS CHANGES / REJECTED
+      - Top 3 priority action items
+      
+      Reference specific findings from each reviewer.
+
+# Persistent memory configuration
+memory:
+  vector_db: true
+  semantic_search: true
+  top_k: 15
+  persist: true
+
+models:
+  openai:
+    provider: openai
+    model: gpt-3.5-turbo
+    max_tokens: 2000
+    temperature: 0.7
+
+workflow:
+  type: sequential
+  steps:
+    - agent: code_parser
+    - parallel:
+        branches:
+          - security_reviewer
+          - performance_reviewer
+          - style_reviewer
+        then:
+          agent: review_summarizer
