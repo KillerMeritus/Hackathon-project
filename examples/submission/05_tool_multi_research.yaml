@@ -1,0 +1,127 @@
+# SUBMISSION EXAMPLE 5: Multiple Tools Workflow
+# Demonstrates: Multiple tool types + Parallel + Persistent memory
+# Use Case: Research Assistant with Web Search and Code Execution
+
+name: research_assistant
+description: |
+  Research assistant workflow using multiple tools.
+  Combines web search, data processing, and analysis.
+  Shows how agents can use different tools for different tasks.
+
+# MCP Server Configuration (external tools)
+mcp_servers:
+  - id: web_search
+    url: "http://localhost:3000"
+    auto_discover: true
+    description: Web search and content fetching
+
+# Built-in tools
+tools:
+  - name: python
+    type: builtin
+    description: Execute Python code for data processing
+
+agents:
+  # Parallel Research Phase
+  - id: web_researcher
+    role: Web Research Specialist
+    model: openai
+    goal: Search and gather information from the web
+    tools:
+      - mcp:web_search
+    instruction: |
+      Use web search tool to:
+      
+      - Search for relevant information on the topic
+      - Gather data from multiple sources
+      - Verify information accuracy
+      - Collect statistics and facts
+      
+      Provide sources for all information.
+      Store key facts for other agents.
+
+  - id: data_processor
+    role: Data Processing Specialist
+    model: openai
+    goal: Process and structure collected data
+    tools:
+      - python
+    instruction: |
+      Using data from shared memory:
+      
+      Process data using Python:
+      - Clean and normalize data
+      - Calculate statistics
+      - Create summaries
+      - Format for analysis
+      
+      Show Python code for transparency.
+
+  - id: fact_checker
+    role: Fact Verification Specialist
+    model: openai
+    goal: Verify accuracy and cross-reference information
+    tools:
+      - mcp:web_search
+    instruction: |
+      Using research from shared memory:
+      
+      Verify:
+      - Cross-reference facts with other sources
+      - Check for contradictions
+      - Rate confidence level for each fact
+      - Flag uncertain information
+      
+      Use search tool to verify claims.
+
+  # Aggregator
+  - id: research_compiler
+    role: Research Report Compiler
+    model: openai
+    goal: Compile all research into comprehensive report
+    instruction: |
+      Using ALL research from shared memory:
+      
+      Create comprehensive report:
+      
+      ## RESEARCH REPORT
+      
+      ### Executive Summary
+      Key findings in 3-5 bullet points
+      
+      ### Verified Facts
+      Facts with high confidence (from fact_checker)
+      
+      ### Data Analysis
+      Statistical findings (from data_processor)
+      
+      ### Sources
+      All sources cited (from web_researcher)
+      
+      ### Confidence Assessment
+      Overall research reliability score
+      
+      Reference specific findings from each agent.
+
+# Persistent memory configuration  
+memory:
+  vector_db: true
+  semantic_search: true
+  top_k: 15
+  persist: true
+
+models:
+  openai:
+    provider: openai
+    model: gpt-3.5-turbo
+    max_tokens: 2000
+    temperature: 0.7
+
+workflow:
+  type: parallel
+  branches:
+    - web_researcher
+    - data_processor
+    - fact_checker
+  then:
+    agent: research_compiler

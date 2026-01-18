@@ -1,0 +1,102 @@
+# SUBMISSION EXAMPLE 3: Tool-Enabled Workflow with MCP Server
+# Demonstrates: MCP tool integration + Sequential workflow + Persistent memory
+# Use Case: Data Analysis with External Tools
+
+name: data_analysis_with_tools
+description: |
+  Data analysis workflow using MCP tools for calculations and external data.
+  Agents can use tools for live data fetching and processing.
+  Demonstrates tool-agent integration and persistent memory.
+
+# MCP Server Configuration - External tool server
+mcp_servers:
+  - id: data_tools
+    url: "http://localhost:9090"
+    auto_discover: true
+    description: Data fetching and processing tools
+
+agents:
+  - id: data_collector
+    role: Data Collection Specialist
+    model: openai
+    goal: Gather and structure data for analysis
+    tools:
+      - mcp:data_tools  # Uses MCP tools for data fetching
+    instruction: |
+      Collect relevant data using available MCP tools:
+      
+      - Use fetch_data tool to get current data
+      - Use search tool to find relevant information
+      - Structure data for analysis
+      - Identify data quality issues
+      - Prepare dataset summary
+      
+      Store all collected data points in your output for analysis.
+      Reference the tools you used and their outputs.
+
+  - id: data_analyst
+    role: Data Analyst
+    model: openai
+    goal: Analyze collected data and find patterns
+    tools:
+      - python  # Uses built-in Python tool
+    instruction: |
+      Using data from shared memory (collected by data_collector):
+      
+      Perform analysis using Python tool:
+      - Calculate key statistics (mean, median, std dev)
+      - Identify trends and patterns
+      - Find correlations
+      - Detect anomalies
+      
+      Execute Python code for calculations:
+      ```python
+      # Example: Calculate statistics
+      data = [values from data_collector]
+      mean_val = sum(data) / len(data)
+      print(f"Mean: {mean_val}")
+      ```
+      
+      Present findings with specific numbers.
+
+  - id: insight_generator
+    role: Business Intelligence Analyst
+    model: openai
+    goal: Generate actionable business insights from analysis
+    instruction: |
+      Using data analysis from shared memory:
+      
+      Generate insights:
+      - Key findings and their business implications
+      - Recommendations based on data
+      - Predicted trends
+      - Action items for stakeholders
+      
+      Reference specific numbers from the data_analyst.
+
+# Built-in tools configuration
+tools:
+  - name: python
+    type: builtin
+    description: Execute Python code for calculations and data processing
+
+# Persistent memory configuration
+memory:
+  vector_db: true
+  semantic_search: true
+  top_k: 10
+  persist: true
+
+models:
+  openai:
+    provider: openai
+    model: gpt-3.5-turbo
+    max_tokens: 2000
+    temperature: 0.7
+
+workflow:
+  type: sequential
+  steps:
+    - agent: data_collector
+    - agent: data_analyst
+    - agent: insight_generator

@@ -1,0 +1,132 @@
+# Mixed Workflow Example: E-commerce Product Launch
+# Sequential phases with parallel work within each phase
+
+name: ecommerce_product_launch
+description: Complete e-commerce product launch from concept to go-live
+
+agents:
+  # Phase 1: Research (Parallel)
+  - id: customer_researcher
+    role: Customer Insights Analyst
+    model: openai
+    goal: Define target customer personas and pain points
+    instructions: |
+      - Create detailed buyer personas
+      - Identify customer pain points
+      - Map customer journey
+      - Define value propositions
+
+  - id: competitor_researcher
+    role: Competitive Intelligence Analyst
+    model: openai
+    goal: Analyze competitor products, pricing, and strategies
+    instructions: |
+      - Identify direct and indirect competitors
+      - Analyze competitor pricing strategies
+      - Review competitor product features
+      - Find market gaps and opportunities
+
+  - id: trend_researcher
+    role: Market Trends Analyst
+    model: openai
+    goal: Identify market trends and emerging opportunities
+    instructions: |
+      - Research industry trends
+      - Identify emerging technologies
+      - Analyze seasonal patterns
+      - Forecast market direction
+
+  # Phase 1 Aggregator
+  - id: research_synthesizer
+    role: Research Lead
+    model: openai
+    goal: Synthesize all research into actionable insights
+    instructions: |
+      - Combine all research findings
+      - Prioritize key insights
+      - Create research summary document
+      - Recommend product positioning
+
+  # Phase 2: Planning (Sequential from research)
+  - id: product_planner
+    role: Product Manager
+    model: openai
+    goal: Create product specifications and roadmap
+    instructions: |
+      - Define product features and MVP scope
+      - Create product requirements document
+      - Prioritize features using MoSCoW method
+      - Set launch timeline
+
+  - id: pricing_strategist
+    role: Pricing Specialist
+    model: openai
+    goal: Develop pricing strategy and promotional plan
+    instructions: |
+      - Recommend pricing model (subscription, one-time, etc.)
+      - Set price points for different tiers
+      - Plan launch promotions and discounts
+      - Calculate margin targets
+
+  # Phase 3: Execution (Parallel)
+  - id: content_creator
+    role: Content Marketing Lead
+    model: openai
+    goal: Create product descriptions, landing page copy, and marketing content
+    instructions: |
+      - Write compelling product descriptions
+      - Create landing page copy
+      - Develop email marketing sequences
+      - Plan social media content
+
+  - id: tech_implementer
+    role: E-commerce Developer
+    model: openai
+    goal: Plan technical implementation for product listing and checkout
+    instructions: |
+      - Define product catalog structure
+      - Plan inventory management integration
+      - Set up payment gateway configuration
+      - Configure shipping options
+
+  # Final Launch Coordinator
+  - id: launch_coordinator
+    role: Launch Project Manager
+    model: openai
+    goal: Create final launch checklist and go-live plan
+    instructions: |
+      - Create comprehensive launch checklist
+      - Define go/no-go criteria
+      - Plan launch day activities
+      - Set up monitoring and success metrics
+
+workflow:
+  type: sequential
+  steps:
+    # Phase 1: Parallel Research
+    - parallel:
+        branches:
+          - customer_researcher
+          - competitor_researcher
+          - trend_researcher
+        then:
+          agent: research_synthesizer
+    
+    # Phase 2: Sequential Planning
+    - agent: product_planner
+    - agent: pricing_strategist
+    
+    # Phase 3: Parallel Execution
+    - parallel:
+        branches:
+          - content_creator
+          - tech_implementer
+        then:
+          agent: launch_coordinator
+
+models:
+  openai:
+    provider: openai
+    model_name: gpt-3.5-turbo
+    max_tokens: 2000
+    temperature: 0.7

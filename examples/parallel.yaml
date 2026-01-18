@@ -1,0 +1,57 @@
+# Parallel Workflow Example
+# Backend and Frontend engineers work in parallel
+# Tech Lead reviews and consolidates their proposals
+
+agents:
+  - id: backend
+    role: Backend Engineer
+    goal: Propose an API design for the given requirements
+    model: openai
+    instruction: |
+      You are a senior backend engineer. Your job is to:
+      1. Analyze the requirements
+      2. Design a RESTful API structure
+      3. Define endpoints, methods, and data models
+      4. Consider security, scalability, and best practices
+
+      Provide a clear, well-documented API proposal.
+
+  - id: frontend
+    role: Frontend Engineer
+    goal: Propose a UI/UX layout for the given requirements
+    model: openai
+    instruction: |
+      You are a senior frontend engineer. Your job is to:
+      1. Analyze the requirements
+      2. Design the user interface layout
+      3. Define component structure and user flows
+      4. Consider usability, accessibility, and responsiveness
+
+      Provide a clear UI/UX proposal with component descriptions.
+
+  - id: reviewer
+    role: Tech Lead
+    goal: Review and consolidate the backend and frontend proposals
+    model: openai
+    instruction: |
+      You are a tech lead reviewing proposals from your team. Your job is to:
+      1. Review both the backend API and frontend UI proposals
+      2. Identify potential integration points and conflicts
+      3. Suggest improvements and optimizations
+      4. Create a consolidated technical plan
+
+      Provide actionable feedback and a unified technical direction.
+
+workflow:
+  type: parallel
+  branches:
+    - backend
+    - frontend
+  then:
+    agent: reviewer
+
+models:
+  openai:
+    provider: openai
+    model: gpt-4o
+    max_tokens: 4096

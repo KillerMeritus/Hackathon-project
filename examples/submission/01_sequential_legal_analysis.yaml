@@ -1,0 +1,107 @@
+# SUBMISSION EXAMPLE 1: Sequential Workflow with Persistent Memory
+# Demonstrates: Sequential agent execution + Shared memory between agents
+# Use Case: Legal Contract Analysis Pipeline
+
+name: legal_contract_analyzer
+description: |
+  Sequential legal contract analysis workflow.
+  Each agent receives context from previous agents via shared memory.
+  Demonstrates how later agents can reference findings from earlier agents.
+
+agents:
+  - id: contract_reader
+    role: Legal Document Specialist
+    model: openai
+    goal: Parse and extract key information from the contract
+    instruction: |
+      Extract and structure the following from the contract context:
+      
+      - Parties involved (names, roles)
+      - Contract type and purpose
+      - Key dates (effective date, expiration, renewal dates)
+      - Financial terms (amounts, payment schedules, penalties)
+      - Key clauses and obligations
+      
+      Format as clear bullet points for other team members.
+
+  - id: risk_analyzer
+    role: Legal Risk Analyst
+    model: openai
+    goal: Identify potential legal risks and liabilities
+    instruction: |
+      Using the contract information from shared memory:
+      
+      Analyze and identify:
+      - Potential legal risks and liabilities
+      - Unfavorable terms or clauses
+      - Hidden obligations or penalties
+      - Compliance concerns
+      - Termination risks
+      
+      Rate each risk as HIGH/MEDIUM/LOW.
+
+  - id: negotiation_advisor
+    role: Contract Negotiation Expert
+    model: openai
+    goal: Recommend negotiation strategies based on analysis
+    instruction: |
+      Using contract details AND risk analysis from shared memory:
+      
+      Provide:
+      - Strategic negotiation recommendations
+      - Clauses to push back on
+      - Counter-proposal suggestions
+      - Key points to protect
+      - Walk-away triggers
+      
+      Reference specific risks identified by the risk analyzer.
+
+  - id: summary_writer
+    role: Executive Summary Writer
+    model: openai
+    goal: Create an executive-ready summary of all findings
+    instruction: |
+      Using ALL previous analyses from shared memory:
+      
+      Create an executive summary including:
+      
+      1. CONTRACT OVERVIEW
+         - Key parties and purpose
+         - Critical dates and amounts
+      
+      2. RISK ASSESSMENT
+         - Top 3 risks (from risk_analyzer)
+         - Risk mitigation steps
+      
+      3. NEGOTIATION STRATEGY
+         - Key recommendations
+         - Priority action items
+      
+      4. GO/NO-GO RECOMMENDATION
+         - Clear recommendation with justification
+      
+      This summary will be presented to the executive team.
+
+# Persistent memory configuration
+memory:
+  vector_db: true
+  semantic_search: true
+  top_k: 10
+  persist: true
+
+# Model configuration  
+models:
+  openai:
+    provider: openai
+    model: gpt-3.5-turbo
+    max_tokens: 2000
+    temperature: 0.7
+
+# Sequential workflow - each agent builds on previous
+workflow:
+  type: sequential
+  steps:
+    - agent: contract_reader
+    - agent: risk_analyzer
+    - agent: negotiation_advisor
+    - agent: summary_writer

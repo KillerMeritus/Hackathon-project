@@ -1,0 +1,140 @@
+# SUBMISSION EXAMPLE 2: Parallel Workflow with Persistent Memory
+# Demonstrates: Parallel agent execution + Aggregation + Shared memory
+# Use Case: Investment Research Report
+
+name: investment_research_report
+description: |
+  Parallel investment research workflow with aggregation.
+  Multiple analysts work in parallel, results aggregated by lead analyst.
+  All findings stored in shared memory for cross-reference.
+
+agents:
+  # Parallel Research Analysts
+  - id: fundamental_analyst
+    role: Fundamental Analysis Expert
+    model: openai
+    goal: Analyze company fundamentals and financial health
+    instruction: |
+      Conduct fundamental analysis including:
+      
+      - Revenue and earnings trends (YoY growth)
+      - Profit margins and profitability ratios
+      - Balance sheet strength (debt/equity, current ratio)
+      - Cash flow analysis
+      - Management quality assessment
+      - Intrinsic value estimation
+      
+      Provide specific numbers and ratios where possible.
+      Rate overall fundamental strength: STRONG/MODERATE/WEAK
+
+  - id: technical_analyst
+    role: Technical Analysis Expert
+    model: openai
+    goal: Analyze price patterns and market trends
+    instruction: |
+      Conduct technical analysis including:
+      
+      - Current price trend (uptrend/downtrend/sideways)
+      - Key support and resistance levels
+      - Volume analysis
+      - Momentum indicators (RSI, MACD interpretation)
+      - Chart patterns (if applicable)
+      - Entry and exit price recommendations
+      
+      Provide specific price levels and targets.
+      Signal: BUY/HOLD/SELL with confidence level
+
+  - id: sentiment_analyst
+    role: Market Sentiment Analyst
+    model: openai
+    goal: Analyze market sentiment and news impact
+    instruction: |
+      Analyze market sentiment including:
+      
+      - Recent news and announcements impact
+      - Analyst ratings and price targets (consensus)
+      - Social media and retail investor sentiment
+      - Institutional buying/selling activity
+      - Sector sentiment and peer comparison
+      - Upcoming catalysts (earnings, events)
+      
+      Rate sentiment: BULLISH/NEUTRAL/BEARISH
+      Provide sentiment score (1-10)
+
+  - id: risk_analyst
+    role: Investment Risk Analyst
+    model: openai
+    goal: Assess investment risks and portfolio impact
+    instruction: |
+      Analyze investment risks including:
+      
+      - Market risk and volatility (Beta)
+      - Industry-specific risks
+      - Company-specific risks (debt, concentration)
+      - Regulatory and legal risks
+      - Macroeconomic risks (interest rates, inflation)
+      - Liquidity risk
+      
+      Rate overall risk: HIGH/MEDIUM/LOW
+      Suggest position sizing and risk mitigation
+
+  # Aggregator - Synthesizes all research
+  - id: lead_analyst
+    role: Lead Investment Analyst
+    model: openai
+    goal: Create comprehensive investment recommendation
+    instruction: |
+      Using ALL research from shared memory (fundamental, technical, 
+      sentiment, and risk analyses), create a comprehensive report:
+      
+      ## INVESTMENT RECOMMENDATION
+      
+      ### 1. Summary Ratings
+      | Analysis Type | Rating | Analyst |
+      |--------------|--------|---------|
+      | Fundamental | [from analyst] | fundamental_analyst |
+      | Technical | [from analyst] | technical_analyst |
+      | Sentiment | [from analyst] | sentiment_analyst |
+      | Risk | [from analyst] | risk_analyst |
+      
+      ### 2. Key Findings
+      - Top 3 bullish factors
+      - Top 3 bearish factors
+      
+      ### 3. Final Recommendation
+      - ACTION: [STRONG BUY / BUY / HOLD / SELL / STRONG SELL]
+      - Target Price: [from technical analysis]
+      - Stop Loss: [suggested level]
+      - Position Size: [from risk analysis]
+      - Time Horizon: [short/medium/long term]
+      
+      ### 4. Risks to Monitor
+      - Key risks that could change recommendation
+      
+      Cite specific findings from each analyst.
+
+# Persistent memory configuration
+memory:
+  vector_db: true
+  semantic_search: true
+  top_k: 10
+  persist: true
+
+# Model configuration
+models:
+  openai:
+    provider: openai
+    model: gpt-3.5-turbo
+    max_tokens: 2000
+    temperature: 0.7
+
+# Parallel workflow with aggregator
+workflow:
+  type: parallel
+  branches:
+    - fundamental_analyst
+    - technical_analyst
+    - sentiment_analyst
+    - risk_analyst
+  then:
+    agent: lead_analyst
