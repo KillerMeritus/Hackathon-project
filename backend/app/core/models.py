@@ -17,7 +17,7 @@ class AgentConfig(BaseModel):
     id: str = Field(..., description="Unique agent identifier")
     role: str = Field(..., description="Human-readable role")
     goal: str = Field(..., description="Task or objective")
-    model: str = Field(default="claude", description="LLM model to use")
+    model: str = Field(default="openai", description="LLM model to use")
     tools: List[str] = Field(default_factory=list, description="List of tools")
     instruction: Optional[str] = Field(None, description="Custom instruction")
     description: Optional[str] = Field(None, description="Agent description")
@@ -40,6 +40,16 @@ class ModelConfig(BaseModel):
     temperature: float = Field(default=0.7, description="Temperature setting")
 
 
+class MCPServerConfig(BaseModel):
+    """Configuration for an MCP (Model Context Protocol) server"""
+    id: str = Field(..., description="Unique server identifier")
+    url: str = Field(..., description="MCP server URL (http:// or command for stdio)")
+    transport: str = Field(default="http", description="Transport type: http or stdio")
+    auto_discover: bool = Field(default=True, description="Auto-discover all tools from server")
+    tools: List[str] = Field(default_factory=list, description="Specific tools to load (if not auto_discover)")
+    timeout: int = Field(default=30, description="Request timeout in seconds")
+
+
 class YAMLConfig(BaseModel):
     """Root configuration parsed from YAML"""
     agents: List[AgentConfig] = Field(..., description="List of agent configurations")
@@ -47,6 +57,10 @@ class YAMLConfig(BaseModel):
     models: Dict[str, ModelConfig] = Field(
         default_factory=dict,
         description="Model configurations"
+    )
+    mcp_servers: List[MCPServerConfig] = Field(
+        default_factory=list,
+        description="MCP server configurations for external tools"
     )
 
 
