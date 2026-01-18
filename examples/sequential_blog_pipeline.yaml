@@ -1,0 +1,61 @@
+# Sequential Workflow Example: Blog Content Pipeline
+# Each agent passes output to the next in order
+
+name: blog_content_pipeline
+description: Create a complete blog post from topic research to final content
+
+agents:
+  - id: topic_researcher
+    role: Content Research Specialist
+    model: openai
+    goal: Research trending topics and gather relevant data points, statistics, and expert opinions for the blog post
+    instructions: |
+      - Find current trends related to the topic
+      - Identify key statistics and data points
+      - List expert opinions and quotes
+      - Provide source references
+
+  - id: outline_creator
+    role: Content Strategist
+    model: openai
+    goal: Create a detailed blog post outline based on the research with clear sections and key points
+    instructions: |
+      - Create engaging title options
+      - Structure with H2 and H3 headings
+      - Include key points for each section
+      - Suggest word count per section
+
+  - id: content_writer
+    role: Blog Content Writer
+    model: openai
+    goal: Write the full blog post following the outline, incorporating research data
+    instructions: |
+      - Write engaging introduction
+      - Develop each section with examples
+      - Include transitions between sections
+      - Add call-to-action at the end
+
+  - id: seo_optimizer
+    role: SEO Specialist
+    model: openai
+    goal: Optimize the content for search engines and suggest improvements
+    instructions: |
+      - Suggest primary and secondary keywords
+      - Optimize meta title and description
+      - Add internal linking suggestions
+      - Check keyword density
+
+workflow:
+  type: sequential
+  steps:
+    - agent: topic_researcher
+    - agent: outline_creator
+    - agent: content_writer
+    - agent: seo_optimizer
+
+models:
+  openai:
+    provider: openai
+    model_name: gpt-3.5-turbo
+    max_tokens: 2000
+    temperature: 0.7

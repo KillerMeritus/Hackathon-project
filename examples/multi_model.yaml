@@ -1,0 +1,57 @@
+# Multi-Model Workflow Example
+# Uses different LLM providers for different agents
+# Demonstrates interoperability between models
+
+agents:
+  - id: creative_writer
+    role: Creative Writer
+    goal: Generate creative ideas and concepts
+    model: gemini
+    instruction: |
+      You are a creative writer with a vivid imagination.
+      Generate unique and innovative ideas.
+      Think outside the box and be creative.
+
+  - id: technical_reviewer
+    role: Technical Reviewer
+    goal: Review ideas for technical feasibility
+    model: openai
+    instruction: |
+      You are a technical reviewer.
+      Evaluate ideas for practical implementation.
+      Identify potential challenges and solutions.
+
+  - id: final_editor
+    role: Final Editor
+    goal: Polish and finalize the content
+    model: claude
+    instruction: |
+      You are a final editor.
+      Combine creative ideas with technical feedback.
+      Produce a polished, actionable final output.
+
+workflow:
+  type: sequential
+  steps:
+    - agent: creative_writer
+    - agent: technical_reviewer
+    - agent: final_editor
+
+models:
+  gemini:
+    provider: google
+    model: gemini-1.5-flash
+    max_tokens: 4096
+    temperature: 0.9
+
+  openai:
+    provider: openai
+    model: gpt-4o
+    max_tokens: 4096
+    temperature: 0.5
+
+  claude:
+    provider: anthropic
+    model: claude-sonnet-4-20250514
+    max_tokens: 4096
+    temperature: 0.7

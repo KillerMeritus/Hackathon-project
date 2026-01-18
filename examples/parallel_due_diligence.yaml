@@ -1,0 +1,73 @@
+# Parallel Workflow Example: Startup Due Diligence
+# Multiple analysts work simultaneously, then results are aggregated
+
+name: startup_due_diligence
+description: Comprehensive startup analysis for investment decision
+
+agents:
+  - id: financial_analyst
+    role: Financial Analyst
+    model: openai
+    goal: Analyze startup financials, revenue model, burn rate, and runway
+    instructions: |
+      - Evaluate revenue streams and growth rate
+      - Calculate burn rate and runway
+      - Assess unit economics (CAC, LTV)
+      - Identify financial red flags
+
+  - id: market_analyst
+    role: Market Research Analyst
+    model: openai
+    goal: Analyze the market opportunity, competition, and positioning
+    instructions: |
+      - Estimate total addressable market (TAM)
+      - Identify key competitors and their strengths
+      - Analyze market trends and growth
+      - Evaluate startup's competitive advantage
+
+  - id: tech_analyst
+    role: Technical Due Diligence Expert
+    model: openai
+    goal: Evaluate the technology stack, scalability, and engineering team
+    instructions: |
+      - Assess technology stack and architecture
+      - Evaluate scalability and technical debt
+      - Review engineering team capabilities
+      - Identify potential technical risks
+
+  - id: legal_analyst
+    role: Legal & Compliance Specialist
+    model: openai
+    goal: Review legal structure, IP protection, and regulatory compliance
+    instructions: |
+      - Verify corporate structure and cap table
+      - Assess intellectual property protection
+      - Check regulatory compliance requirements
+      - Identify potential legal risks
+
+  - id: investment_decision_maker
+    role: Investment Committee Lead
+    model: openai
+    goal: Synthesize all analyses and provide final investment recommendation
+    instructions: |
+      - Summarize key findings from all analysts
+      - Weigh strengths vs risks
+      - Provide investment recommendation (Invest/Pass/Further DD)
+      - Suggest deal terms if recommending investment
+
+workflow:
+  type: parallel
+  branches:
+    - financial_analyst
+    - market_analyst
+    - tech_analyst
+    - legal_analyst
+  then:
+    agent: investment_decision_maker
+
+models:
+  openai:
+    provider: openai
+    model_name: gpt-3.5-turbo
+    max_tokens: 2000
+    temperature: 0.7

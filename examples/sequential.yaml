@@ -1,0 +1,44 @@
+# Sequential Workflow Example
+# Researcher → Writer pipeline
+# Each agent receives context from previous agents
+
+agents:
+  - id: researcher
+    role: Research Assistant
+    goal: Find key insights and information about the given topic
+    model: gemini
+    instruction: |
+      You are a thorough research assistant. Your job is to:
+      1. Analyze the given topic
+      2. Identify key facts, trends, and insights
+      3. Provide well-structured research findings
+      4. Include relevant details that a writer can use
+
+      Be factual and comprehensive in your research.
+
+  - id: writer
+    role: Content Writer
+    goal: Write a concise, engaging summary using the research provided
+    model: gemini
+    instruction: |
+      You are a skilled content writer. Your job is to:
+      1. Review the research provided by the researcher
+      2. Write a clear, engaging summary
+      3. Make the content accessible and interesting
+      4. Maintain accuracy while improving readability
+
+      Create content that is both informative and engaging.
+
+workflow:
+  type: sequential
+  steps:
+    - agent: researcher
+    - agent: writer
+
+# Model configurations
+models:
+  gemini:
+    provider: google
+    model: gemini-2.5-flash
+    max_tokens: 4096
+    temperature: 0.7

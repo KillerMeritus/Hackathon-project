@@ -1,0 +1,109 @@
+# SUBMISSION EXAMPLE 4: Python Tool Integration Workflow
+# Demonstrates: Python code execution tool + Persistent memory
+# Use Case: Financial Calculator Pipeline
+
+name: financial_calculator
+description: |
+  Financial analysis workflow using Python tool for precise calculations.
+  Demonstrates tool-agent integration for complex computations.
+  All calculations are verified using Python execution.
+
+# Built-in tools configuration
+tools:
+  - name: python
+    type: builtin
+    description: Execute Python code for precise financial calculations
+
+agents:
+  - id: data_extractor
+    role: Financial Data Extractor
+    model: openai
+    goal: Extract and structure financial data for calculation
+    instruction: |
+      Extract financial data from the query:
+      
+      - Investment amount (Principal)
+      - Interest rate / Expected return
+      - Time period (years)
+      - Compounding frequency (annual/monthly/daily)
+      - Additional parameters (fees, inflation, etc.)
+      
+      Structure data clearly for the calculator.
+      Use these defaults if not specified:
+      - Rate: 10% annual
+      - Period: 5 years
+      - Compounding: Annual
+      - Inflation: 3%
+      
+      Output as key-value pairs.
+
+  - id: financial_calculator
+    role: Financial Calculation Specialist
+    model: openai
+    goal: Perform accurate financial calculations using Python tool
+    tools:
+      - python  # Uses Python tool for calculations
+    instruction: |
+      Using data from shared memory, perform calculations with Python:
+      
+      Execute Python code for:
+      
+      1. Compound Interest:
+      ```python
+      P = principal
+      r = rate / 100
+      n = compounding_frequency
+      t = years
+      A = P * (1 + r/n) ** (n*t)
+      print(f"Future Value: ${A:,.2f}")
+      ```
+      
+      2. Monthly Payment Schedule
+      3. ROI and CAGR calculations
+      4. Inflation-adjusted returns
+      5. Total interest earned
+      
+      Show the Python code used and calculate exact results.
+      Format all currency values with proper formatting.
+
+  - id: financial_advisor
+    role: Financial Advisor
+    model: openai
+    goal: Interpret calculations and provide recommendations
+    instruction: |
+      Using calculations from shared memory (from financial_calculator):
+      
+      Provide:
+      - Interpretation of the numbers in plain language
+      - Comparison with benchmarks (S&P 500 avg: ~10% annually)
+      - Risk considerations
+      - Alternative scenarios (what if rate was 2% higher?)
+      - Clear recommendations
+      
+      Reference specific calculated values:
+      - Future value
+      - Total interest earned
+      - Real return after inflation
+      
+      Make it actionable for the user.
+
+# Persistent memory configuration
+memory:
+  vector_db: true
+  semantic_search: true
+  top_k: 10
+  persist: true
+
+models:
+  openai:
+    provider: openai
+    model: gpt-3.5-turbo
+    max_tokens: 2000
+    temperature: 0.7
+
+workflow:
+  type: sequential
+  steps:
+    - agent: data_extractor
+    - agent: financial_calculator
+    - agent: financial_advisor
