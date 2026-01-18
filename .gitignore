@@ -1,0 +1,18 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+.pytest_cache/
+
+# Databases & Memory
+vector_db/
+memory/
+*.sqlite3
+
+# OS
+.DS_Store
