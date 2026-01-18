@@ -17,17 +17,17 @@ logger = logging.getLogger(__name__)
 
 
 class MCPToolLoader:
-   
+
     
     def __init__(self, mcp_configs: List["MCPServerConfig"]):
-       
+
         self.configs = {config.id: config for config in mcp_configs}
         self.clients: Dict[str, MCPClient] = {}
         self.tools: Dict[str, MCPTool] = {}  # Keyed by "server_id:tool_name"
         self._loaded = False
     
     async def load_all_tools(self) -> Dict[str, MCPTool]:
-       
+
         if self._loaded:
             return self.tools
         
@@ -111,7 +111,7 @@ def get_mcp_loader() -> Optional[MCPToolLoader]:
 
 
 def set_mcp_loader(loader: MCPToolLoader) -> None:
-
+ 
     global _mcp_loader
     _mcp_loader = loader
 
